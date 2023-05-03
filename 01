@@ -1,0 +1,105 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+// User class to represent a social network user
+class User {
+    private String username;
+    private String password;
+    private List<User> following;
+    private List<FeedItem> feed;
+    private String sessionId;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+        this.following = new ArrayList<>();
+        this.feed = new ArrayList<>();
+        this.sessionId = null;
+    }
+
+    // Getters and setters omitted for brevity
+}
+
+// FeedItem class to represent a post or comment
+class FeedItem {
+    private User user;
+    private String content;
+    private FeedItem parent;
+    private long timestamp;
+    private int upvotes;
+    private int downvotes;
+
+    public FeedItem(User user, String content, FeedItem parent) {
+        this.user = user;
+        this.content = content;
+        this.parent = parent;
+        this.timestamp = System.currentTimeMillis();
+        this.upvotes = 0;
+        this.downvotes = 0;
+    }
+
+    // Getters and setters omitted for brevity
+}
+
+// SocialNetwork class to manage users and feed items
+class SocialNetwork {
+    private Map<String, User> users;
+    private Map<String, String> sessions;
+
+    public SocialNetwork() {
+        this.users = new HashMap<>();
+        this.sessions = new HashMap<>();
+    }
+
+    // Signup a new user
+    public void signup(String username, String password) {
+        User user = new User(username, password);
+        users.put(username, user);
+        System.out.println("User " + username + " signed up successfully");
+    }
+
+    // Login a user and start a new session
+    public void login(String username, String password) {
+        User user = users.get(username);
+        if (user != null && user.getPassword().equals(password)) {
+            String sessionId = generateSessionId();
+            user.setSessionId(sessionId);
+            sessions.put(sessionId, username);
+            System.out.println("User " + username + " logged in successfully with session ID " + sessionId);
+        } else {
+            System.out.println("Invalid username or password");
+        }
+    }
+
+    // Generate a new session ID
+    private String generateSessionId() {
+        return "session_" + System.currentTimeMillis();
+    }
+
+    // Get a user by session ID
+    private User getUserBySessionId(String sessionId) {
+        String username = sessions.get(sessionId);
+        if (username != null) {
+            return users.get(username);
+        } else {
+            return null;
+        }
+    }
+
+    // Main method to run the program
+    public static void main(String[] args) {
+        SocialNetwork socialNetwork = new SocialNetwork();
+
+        // Command line parsing omitted for brevity
+        String command = args[0];
+        if (command.equals("signup")) {
+            socialNetwork.signup(args[1], args[2]);
+        } else if (command.equals("login")) {
+            socialNetwork.login(args[1], args[2]);
+        } else {
+            System.out.println("Invalid command");
+        }
+    }
+}
